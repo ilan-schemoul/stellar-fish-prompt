@@ -1,25 +1,6 @@
-# If current directory matches this regex then we will check symbolic link
-set symbolic_link_regex "mmsx\-"
-# We will resolve this symbolic link to check it against current directory
-set symbolic_link_to_check "$HOME/dev/mmsx"
-
 prompt_async_not_done %self
-
-function _echo_git_branch_name
-  echo (command git symbolic-ref HEAD 2> /dev/null | sed -e 's|^refs/heads/||')
-end
-
-function _check_git_is_dirty
-  command git status -s --ignore-submodules=dirty 2> /dev/null
-end
-
-function _check_rebase
-  test -d "$(git rev-parse --git-path rebase-merge)" || test -d "$(git rev-parse --git-path rebase-apply) 2>/dev/null"
-end
-
-function _check_inside_git
-  git rev-parse --is-inside-git-dir 1> /dev/null 2>& 1
-end
+prompt_set_rebase_status %self -2
+set o 0
 
 function _echo_virtual_env
   if set -q virtual_env
@@ -29,19 +10,18 @@ function _echo_virtual_env
 end
 
 function _check_symlink
-  pwd | grep "$symbolic_link_regex" 1> /dev/null 2>& 1
+  pwd | grep "$prompt_symbolic_link_regex" 1> /dev/null 2>& 1
   # If current directory does not match the regex there is nothing to check
   if test "$status" -ne 0
     return 0
   end
 
   # If not a symbolic link nothing to check
-  if ! test -L "$symbolic_link_to_check"
-    echo "not a $symbolic_link_to_check" > /dev/stderr
+  if ! test -L "$prompt_symbolic_link_to_check"
     return 0
   end
 
-  set -l resolved_path (realpath "$symbolic_link_to_check")
+  set -l resolved_path (realpath "$prompt_symbolic_link_to_check")
   if test "$status" -ne 0
     return 0
   end
@@ -63,20 +43,11 @@ function _echo_pwd
 end
 
 function _echo_prompt
-  set -l inside_git_status -1
-  set -l rebasing_status -1
-
-  _check_inside_git
-  set -l inside_git_status $status
-
-  if test "$inside_git_status" = 0
-    _check_rebase
-    set rebasing_status $status
-  end
+  set -l rebasing_status (prompt_get_rebase_status %self)
 
   if test $argv[1] != 0
     set prompt_color (set_color red)
-  else if test $inside_git_status -eq 0 && test $rebasing_status -eq 0
+  else if test $rebasing_status -eq 0
     set prompt_color (set_color "#da70d6")
   else
     set -l prompt_color (set_color normal)
@@ -88,18 +59,24 @@ end
 
 function fish_prompt
   set -l last_status $status
-  set -l pid %self
 
   _echo_virtual_env
 
   _echo_pwd
 
-  if test "$(prompt_async_get_done $pid)" -eq 1
-    prompt_echo_global_buffer
-    prompt_async_not_done
+  prompt_echo_global_buffer %self
+
+  if test "$(prompt_async_get_done %self)" -eq 1
+    prompt_async_not_done %self
   else
-    update_git_info $pid &
+    prompt_set_global_buffer %self ""
+    set -l script_dir (dirname (realpath (status current-filename)))
+    "$script_dir/update_git_info.fish" %self &> /tmp/update_git_info_logs &
   end
 
   _echo_prompt $last_status
+end
+
+function __async_prompt_repaint_prompt --on-signal SIGUSR1
+  commandline -f repaint >/dev/null 2>/dev/null
 end
