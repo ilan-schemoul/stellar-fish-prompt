@@ -3,6 +3,8 @@ set symbolic_link_regex "mmsx\-"
 # We will resolve this symbolic link to check it against current directory
 set symbolic_link_to_check "$HOME/dev/mmsx"
 
+prompt_async_not_done %self
+
 function _echo_git_branch_name
   echo (command git symbolic-ref HEAD 2> /dev/null | sed -e 's|^refs/heads/||')
 end
@@ -17,30 +19,6 @@ end
 
 function _check_inside_git
   git rev-parse --is-inside-git-dir 1> /dev/null 2>& 1
-end
-
-function _echo_git_info
-  set git_branch (_echo_git_branch_name)
-
-  # -n is not empty string
-  if test -n "$git_branch"
-    if test -n (echo $git_branch | grep "/")
-      set git_branch (echo $git_branch | sed -r "s/.*?\/(.*)/\1/")
-    end
-
-    if [ (_check_git_is_dirty) ]
-      set git_info (set_color yellow) $git_branch "±" (set_color normal)
-    else
-      set git_info (set_color green) $git_branch (set_color normal)
-    end
-
-    set stash_nb (git stash list | wc -l)
-    if test $stash_nb != 0
-      set -a git_info "(" (set_color normal) $stash_nb  ")"
-    end
-
-    echo -n -s ' ' $git_info (set_color normal)
-  end
 end
 
 function _echo_virtual_env
@@ -110,13 +88,18 @@ end
 
 function fish_prompt
   set -l last_status $status
+  set -l pid %self
 
   _echo_virtual_env
 
   _echo_pwd
 
-  # Print info such as git branch, git stash etc.
-  _echo_git_info
+  if test "$(prompt_async_get_done $pid)" -eq 1
+    prompt_echo_global_buffer
+    prompt_async_not_done
+  else
+    update_git_info $pid &
+  end
 
   _echo_prompt $last_status
 end
