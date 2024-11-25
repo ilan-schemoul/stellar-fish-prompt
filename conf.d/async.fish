@@ -2,7 +2,9 @@ set -U async_debug 0
 
 function deval
   if test "$async_debug" -eq 1
+    echo "$(pwd) $argv[1]" >> /tmp/debug
     eval "echo $(pwd) $argv[1] >> /tmp/debug"
+    echo "" >> /tmp/debug
   end
 
   eval "$argv[1]"
@@ -34,6 +36,8 @@ function async_get_buffer
   check_args (count $argv) 1 $argv[1]
 
   set pid $argv[1]
+  # Wait 1 ms because otherwise I randomly get old value ...
+  sleep 0.001
   deval "echo -n \$async_prompt_buffer_$pid"
 end
 
