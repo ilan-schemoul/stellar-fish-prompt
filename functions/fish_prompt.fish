@@ -1,5 +1,5 @@
-prompt_async_not_done %self
-prompt_set_rebase_status %self -2
+async_unlock %self
+async_set_rebase_status %self -2
 set o 0
 
 function _echo_virtual_env
@@ -10,18 +10,18 @@ function _echo_virtual_env
 end
 
 function _check_symlink
-  pwd | grep "$prompt_symbolic_link_regex" 1> /dev/null 2>& 1
+  pwd | grep "$stellar_symlink_regex" 1> /dev/null 2>& 1
   # If current directory does not match the regex there is nothing to check
   if test "$status" -ne 0
     return 0
   end
 
   # If not a symbolic link nothing to check
-  if ! test -L "$prompt_symbolic_link_to_check"
+  if ! test -L "$stellar_symlink_dir"
     return 0
   end
 
-  set -l resolved_path (realpath "$prompt_symbolic_link_to_check")
+  set -l resolved_path (realpath "$stellar_symlink_dir")
   if test "$status" -ne 0
     return 0
   end
@@ -43,7 +43,7 @@ function _echo_pwd
 end
 
 function _echo_prompt
-  set -l rebasing_status (prompt_get_rebase_status %self)
+  set -l rebasing_status (async_get_rebase_status %self)
 
   if test $argv[1] != 0
     set prompt_color (set_color red)
@@ -64,12 +64,12 @@ function fish_prompt
 
   _echo_pwd
 
-  prompt_echo_global_buffer %self
+  async_get_buffer %self
 
-  if test "$(prompt_async_get_done %self)" -eq 1
-    prompt_async_not_done %self
+  if test "$(async_lock_get %self)" -eq 1
+    async_unlock %self
   else
-    prompt_set_global_buffer %self ""
+    async_set_buffer %self ""
     set -l script_dir (dirname (realpath (status current-filename)))
     "$script_dir/update_git_info.fish" %self &> /tmp/update_git_info_logs &
   end

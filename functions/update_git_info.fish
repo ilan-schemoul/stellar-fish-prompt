@@ -39,9 +39,9 @@ function update_git_info
 
     _check_git_is_dirty
     if test $status -ne 0
-      prompt_set_global_buffer $pid (echo "$(set_color yellow) $git_branch±$(set_color normal)$stash_info")
+      async_set_buffer $pid (echo "$(set_color yellow) $git_branch±$(set_color normal)$stash_info")
     else
-      prompt_set_global_buffer $pid (echo "$(set_color yellow) $git_branch$(set_color normal)$stash_info")
+      async_set_buffer $pid (echo "$(set_color yellow) $git_branch$(set_color normal)$stash_info")
     end
 
   end
@@ -49,10 +49,10 @@ function update_git_info
   _check_inside_git
   if test "$status" = 0
     _check_rebase
-    prompt_set_rebase_status $pid $status
+    async_set_rebase_status $pid $status
   end
 
-  prompt_async_done $pid
+  async_lock $pid
   kill -s "SIGUSR1" "$pid" 2>/dev/null
 end
 
