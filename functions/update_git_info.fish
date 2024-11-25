@@ -18,12 +18,19 @@ end
 
 function update_git_info
   set pid $argv[1]
-  set git_branch (_echo_git_branch_name)
 
-  prompt_get_async $pid
-  if test $status -eq 1
-    return
+  trap "kill -s SIGUSR1 $pid" EXIT
+
+  _check_inside_git
+  if test "$status" != 0
+    async_set_buffer $pid ""
+    exit
   end
+
+  _check_rebase
+  async_set_rebase_status $pid $status
+
+  set git_branch (_echo_git_branch_name)
 
   # -n is not empty string
   if test -n "$git_branch"
@@ -43,19 +50,10 @@ function update_git_info
     else
       async_set_buffer $pid (echo "$(set_color yellow) $git_branch$(set_color normal)$stash_info")
     end
-
+  else
+    async_set_buffer $pid ""
   end
-
-  _check_inside_git
-  if test "$status" = 0
-    _check_rebase
-    async_set_rebase_status $pid $status
-  end
-
-  async_lock $pid
-  kill -s "SIGUSR1" "$pid" 2>/dev/null
 end
 
 # 35 ms to execute on my computer
 update_git_info $argv[1]
-
