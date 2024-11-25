@@ -75,7 +75,7 @@ function make_async_request
   if test "$state" -eq "$INITIAL"
     set state "$LOADING"
     set -l script_dir (dirname (realpath (status current-filename)))
-    "$script_dir/update_git_info.fish" %self &> /tmp/update_git_info_logs &
+    "$script_dir/update_git_info.fish" %self >> /tmp/debug 2>&1 &
   end
 
   if test "$state" -eq "$REPAINTING"
