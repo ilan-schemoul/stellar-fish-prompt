@@ -23,6 +23,7 @@ function _echo_virtual_env
   end
 end
 
+# PERF: 3 ms
 function _check_symlink
   pwd | grep "$stellar_symlink_regex" 1> /dev/null 2>& 1
   # If current directory does not match the regex there is nothing to check
