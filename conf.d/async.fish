@@ -50,3 +50,15 @@ function async_get_rebase_status
   set pid $argv[1]
   deval "echo \$async_prompt_rebase_status_$pid"
 end
+
+function async_clean_old_vars
+  for var in (set --names)
+    echo "$var" | grep -q "async_prompt"
+    if test "$status" -eq 0
+      echo "$var" | grep -q "%self"
+      if test "$status" -ne 0
+        set --erase "$var" &
+     end
+    end
+  end
+end
