@@ -29,6 +29,12 @@ As it's asynchronous you can start typing after the first render.
 
 The second render of the prompt (with git infos) takes place 55ms after the beginning (so 39 ms after the first prompt).
 
+# Todo
+
+- Makes this an omf package
+- Add a cache for the async informations
+- Add a cron job to clean old variables ?
+
 # License
 
 [MIT][mit] © [ilan schemoul][author]
