@@ -1,7 +1,7 @@
 set -U prompt_debug 0
 
 function deval
-  if test "$debug" -eq 1
+  if test "$prompt_debug" -eq 1
     eval "echo $argv[1] >> /tmp/debug"
   end
 
