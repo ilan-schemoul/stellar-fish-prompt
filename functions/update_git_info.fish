@@ -49,7 +49,7 @@ function update_git_info
     if test $status -ne 0
       async_set_buffer $pid (echo "$(set_color yellow) $git_branch±$(set_color normal)$stash_info")
     else
-      async_set_buffer $pid (echo "$(set_color yellow) $git_branch$(set_color normal)$stash_info")
+      async_set_buffer $pid (echo "$(set_color green) $git_branch$(set_color normal)$stash_info")
     end
   else
     async_set_buffer $pid ""
