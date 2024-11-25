@@ -81,7 +81,18 @@ function make_async_request
   if test "$state" -eq "$REPAINTING"
     set state "$INITIAL"
   end
+end
 
+function start_profile
+  echo "START" >> /tmp/debug
+  pwd >> /tmp/debug
+  date +%s%N | cut -b1-13 >> /tmp/debug
+end
+
+function end_profile
+  date +%s%N | cut -b1-13 >> /tmp/debug
+  pwd >> /tmp/debug
+  echo "DONE" >> /tmp/debug
 end
 
 function fish_prompt
