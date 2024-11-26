@@ -19,6 +19,7 @@ end
 function update_git_info
   set pid $argv[1]
 
+  # XXX: global variables takes time to update so we need to wait 1ms
   trap "kill -s SIGUSR1 $pid" EXIT
 
   _check_inside_git

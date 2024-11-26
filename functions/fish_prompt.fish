@@ -77,10 +77,6 @@ function make_async_request
     set -l script_dir (dirname (realpath (status current-filename)))
     "$script_dir/update_git_info.fish" %self >> /tmp/debug 2>&1 &
   end
-
-  if test "$state" -eq "$REPAINTING"
-    set state "$INITIAL"
-  end
 end
 
 function start_profile
@@ -99,16 +95,21 @@ function fish_prompt
   # PERF: faster if we make the request before anything else
   make_async_request
 
-  set -l git_infos (async_get_buffer %self)
   set -l last_status $status
 
   _echo_virtual_env
 
   _echo_pwd
 
-  echo -n "$git_infos"
+  if test "$state" -eq "$REPAINTING"
+    async_get_buffer %self
+  end
 
   _echo_prompt $last_status
+
+  if test "$state" -eq "$REPAINTING"
+    set state "$INITIAL"
+  end
 end
 
 function __async_prompt_repaint_prompt --on-signal SIGUSR1
