@@ -41,7 +41,9 @@ function _check_symlink
     return 0
   end
 
-  test "$resolved_path" = "$(pwd)"
+  echo "$resolved_path $(pwd)" >> /tmp/debug
+  # -F means fixed string = don't interpret special characters (^/$ etc.)
+  echo "$(pwd)"  | grep -F "$resolved_path"
 end
 
 function _echo_pwd
