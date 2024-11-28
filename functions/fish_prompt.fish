@@ -1,4 +1,4 @@
-async_set_rebase_status %self -2
+async_set_rebase_status -2
 set INITIAL 0
 set LOADING 1
 set REPAINTING 2
@@ -60,11 +60,12 @@ function _echo_pwd
 end
 
 function _echo_prompt
-  set -l rebasing_status (async_get_rebase_status %self)
+  set -l rebasing_status (async_get_rebase_status)
 
   if test $argv[1] != 0
     set prompt_color (set_color red)
-  else if test $rebasing_status -eq 0
+  else if test -n "$rebasing_status"
+          and test $rebasing_status -eq 0
     set prompt_color (set_color "#da70d6")
   else
     set -l prompt_color (set_color normal)
@@ -104,9 +105,7 @@ function fish_prompt
 
   _echo_pwd
 
-  if test "$state" -eq "$REPAINTING"
-    async_get_buffer %self
-  end
+  async_print_buffer
 
   _echo_prompt $last_status
 

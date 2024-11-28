@@ -18,18 +18,19 @@ end
 
 function update_git_info
   set pid $argv[1]
+  set folder (pwd)
 
   # XXX: global variables takes time to update so we need to wait 1ms
   trap "kill -s SIGUSR1 $pid" EXIT
 
   _check_inside_git
   if test "$status" != 0
-    async_set_buffer $pid ""
+    async_set_buffer ""
     exit
   end
 
   _check_rebase
-  async_set_rebase_status $pid $status
+  async_set_rebase_status $status
 
   set git_branch (_echo_git_branch_name)
 
@@ -47,12 +48,12 @@ function update_git_info
 
     _check_git_is_dirty
     if test $status -ne 0
-      async_set_buffer $pid (echo "$(set_color yellow) $git_branch±$(set_color normal)$stash_info")
+      async_set_buffer (echo "$(set_color yellow) $git_branch±$(set_color normal)$stash_info")
     else
-      async_set_buffer $pid (echo "$(set_color green) $git_branch$(set_color normal)$stash_info")
+      async_set_buffer (echo "$(set_color green) $git_branch$(set_color normal)$stash_info")
     end
   else
-    async_set_buffer $pid ""
+    async_set_buffer ""
   end
 end
 
