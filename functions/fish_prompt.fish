@@ -96,10 +96,11 @@ function end_profile
 end
 
 function fish_prompt
+  # WARN: must come before anything else
+  set -l last_status $status
+
   # PERF: faster if we make the request before anything else
   make_async_request
-
-  set -l last_status $status
 
   _echo_virtual_env
 
