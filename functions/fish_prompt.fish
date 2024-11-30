@@ -95,6 +95,7 @@ function end_profile
   echo "DONE" >> /tmp/debug
 end
 
+# PERF: 14ms
 function fish_prompt
   # WARN: must come before anything else
   set -l last_status $status

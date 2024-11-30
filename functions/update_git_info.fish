@@ -13,7 +13,7 @@ function _echo_git_branch_name
 end
 
 function _check_git_is_dirty
-  command git status -s --ignore-submodules=dirty 2> /dev/null
+  test -z "$(git status --porcelain)"
 end
 
 function update_git_info
@@ -57,5 +57,5 @@ function update_git_info
   end
 end
 
-# 35 ms to execute on my computer
+# 30 ms to execute on my computer
 update_git_info $argv[1]
