@@ -9,7 +9,7 @@ function _check_inside_git
 end
 
 function _echo_git_branch_name
-  echo (command git symbolic-ref HEAD 2> /dev/null | sed -e 's|^refs/heads/||')
+  echo (git symbolic-ref --short HEAD)
 end
 
 function _check_git_is_dirty
