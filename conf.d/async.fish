@@ -50,7 +50,6 @@ function async_get_rebase_status
   deval "echo \$async_prompt_rebase_status_$(hash_pwd)"
 end
 
-# XXX: it's clumsy and manual and error prone
 function async_clean_old_vars
   for var in (set --names)
     echo "$var" | grep -q "async_prompt"
