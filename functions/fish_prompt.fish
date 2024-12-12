@@ -12,7 +12,7 @@ function _echo_virtual_env_with_arg
 end
 
 function _echo_virtual_env
-  if set -q virtual_env
+  if set -q VIRTUAL_ENV
     if type -q python
       _echo_virtual_env_with_arg "python"
     else if type -q python3
