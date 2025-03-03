@@ -25,9 +25,8 @@ end
 
 # PERF: 3 ms
 function _check_symlink
-  pwd | grep "$stellar_symlink_regex" 1> /dev/null 2>& 1
   # If current directory does not match the regex there is nothing to check
-  if test "$status" -ne 0
+  if ! string match -q "$stellar_symlink_regex" (pwd)
     return 0
   end
 
