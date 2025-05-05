@@ -36,9 +36,9 @@ function update_git_info
 
   # -n is not empty string
   if test -n "$git_branch"
-    if test -n (echo $git_branch | grep "/")
-      set git_branch (echo $git_branch | sed -r "s/.*?\/(.*)/\1/")
-    end
+    # if test -n (echo $git_branch | grep "/")
+    #   set git_branch (echo $git_branch | sed -r "s/.*?\/(.*)/\1/")
+    # end
 
     set stash_nb (git stash list | wc -l)
     set stash_info ""
